@@ -168,12 +168,13 @@
 
         function init() {
             myMap = new ymaps.Map("map", {
-                center: [53.243562, 34.363407], 
+                // ОБНОВЛЕННЫЕ КООРДИНАТЫ ТУТ:
+                center: [53.305077, 34.305098], 
                 zoom: 14,
                 controls: ['zoomControl'] 
             });
 
-            // ОБРАЩАЕМСЯ К ТВОЕМУ НОВОМУ СЕРВЕРУ
+            // ОБРАЩАЕМСЯ К ТВОЕМУ СЕРВЕРУ
             fetch('https://Galactic-Stone-qEUak6w8.expresshost.cloud/api/places')
             .then(res => res.json())
             .then(places => {
