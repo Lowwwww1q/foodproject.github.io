@@ -5,6 +5,9 @@
     <title>Где поесть?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
+    <!-- Заглушка, чтобы не вылезала ошибка 404 на иконку -->
+    <link rel="icon" href="data:,">
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
     
@@ -79,7 +82,7 @@
         .tag-rating { color: #ff9800; }
         .tag-distance { color: #2196F3; } 
 
-        /* === КНОПКИ ДЕЙСТВИЙ (МАРШРУТ И ОЦЕНКА) === */
+        /* КНОПКИ ДЕЙСТВИЙ (МАРШРУТ И ОЦЕНКА) */
         .action-buttons {
             display: flex; gap: 10px; margin-top: 15px; width: 100%;
         }
@@ -170,7 +173,8 @@
                 controls: ['zoomControl'] 
             });
 
-            fetch('/api/places', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+            // ОБРАЩАЕМСЯ К ТВОЕМУ НОВОМУ СЕРВЕРУ
+            fetch('https://Galactic-Stone-qEUak6w8.expresshost.cloud/api/places')
             .then(res => res.json())
             .then(places => {
                 allPlaces = places;
@@ -178,7 +182,6 @@
                 places.forEach(place => {
                     let placemark = new ymaps.Placemark([place.lat, place.lon], {
                         balloonContentHeader: `<b>${place.name}</b>`,
-                        // ДОБАВИЛИ ДВЕ КНОПКИ В БАЛУН
                         balloonContentBody: `${place.description}<br><br><b>Цена:</b> ~${place.price}₽<br><b>Рейтинг:</b> ${place.rating.toFixed(1)}⭐
                         <div class="action-buttons">
                             <button class="route-btn" onclick="buildRoute(${place.lat}, ${place.lon})">🧭 Маршрут</button>
@@ -229,7 +232,6 @@
                     distanceHtml = `<span class="tag-distance">📍 ${distText}</span>`;
                 }
 
-                // ДОБАВИЛИ ДВЕ КНОПКИ В КАРТОЧКУ
                 card.innerHTML = `
                     <h3>${place.name}</h3>
                     <p>${place.description}</p>
@@ -286,7 +288,6 @@
                     
                     let distText = place.distance < 1 ? Math.round(place.distance * 1000) + ' м' : place.distance.toFixed(1) + ' км';
                     
-                    // ОБНОВИЛИ БАЛУН ПРИ ПОИСКЕ ГЕОЛОКАЦИИ (с двумя кнопками)
                     place.placemark.properties.set('balloonContentBody', 
                         `${place.description}<br><br><b style="color: #2196F3;">📍 Расстояние: ${distText}</b><br><b>Цена:</b> ~${place.price}₽<br><b>Рейтинг:</b> ${place.rating.toFixed(1)}⭐
                         <div class="action-buttons">
@@ -309,13 +310,8 @@
             });
         }
 
-        // --- НОВАЯ ФУНКЦИЯ ДЛЯ МАРШРУТА ---
         function buildRoute(lat, lon) {
-            // Формируем ссылку для построения маршрута до точки
-            // Параметр rtt=pd означает пешеходный маршрут
             let link = `https://yandex.ru/maps/?rtext=~${lat},${lon}&rtt=pd`;
-            
-            // Пытаемся открыть ссылку системными средствами Telegram
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.openLink(link);
             } else {
